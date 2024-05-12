@@ -5,14 +5,12 @@ import useDeletePostMutation from '@/services/mutations/useDeletePostMutation';
 import useGetPostsQuery from '@/services/queries/useGetPostsQuery';
 
 const ReactQueryPage = () => {
-  const { t } = useAppTranslation();
   const { data, isLoading, isError } = useGetPostsQuery();
   const { mutate: deletePost, isPending: deletePostLoading } =
     useDeletePostMutation();
 
   return (
     <PageWrapper isLoading={isLoading} isError={isError}>
-      <h1>{t('ReactQueryPage.title')}</h1>
       <ul className="grid grid-cols-2">
         {data?.map(post => (
           <li key={post.id} className="flex mt-4 items-center">
@@ -22,13 +20,10 @@ const ReactQueryPage = () => {
               disabled={deletePostLoading}
               className="ml-4"
             >
-              {t('ReactQueryPage.delete')}
+              Delete
             </Button>
-            <LinkButton
-              to={`${t('Routes.reactQuery')}/${post.id}`}
-              className="ml-4"
-            >
-              {t('ReactQueryPage.view')}
+            <LinkButton to={`posts/${post.id}`} className="ml-4">
+              View
             </LinkButton>
           </li>
         ))}
