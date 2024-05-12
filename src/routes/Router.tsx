@@ -2,16 +2,16 @@ import { lazy } from 'react';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import Root from './Root';
 
-const Home = lazy(() => import('./Home/Home'));
-const PostDetails = lazy(() => import('./PostDetails/PostDetails'));
+const HomePage = lazy(() => import('./HomePage/HomePage'));
+const PostDetailsPage = lazy(() => import('./PostDetailsPage/PostDetailsPage'));
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Root />,
     children: [
-      { path: '/', element: <Home /> },
-      { path: 'posts/:id', element: <PostDetails /> },
+      { path: '/', element: <HomePage /> },
+      { path: 'posts/:id', element: <PostDetailsPage /> },
     ],
   },
 ]);
