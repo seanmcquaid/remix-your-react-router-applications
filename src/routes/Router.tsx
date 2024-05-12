@@ -1,5 +1,6 @@
-import { Suspense, lazy } from 'react';
-import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { lazy } from 'react';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import Root from './Root';
 
 const Home = lazy(() => import('./Home/Home'));
 const PostDetails = lazy(() => import('./PostDetails/PostDetails'));
@@ -7,11 +8,7 @@ const PostDetails = lazy(() => import('./PostDetails/PostDetails'));
 const router = createBrowserRouter([
   {
     path: '/',
-    element: (
-      <Suspense>
-        <Outlet />
-      </Suspense>
-    ),
+    element: <Root />,
     children: [
       { path: '/', element: <Home /> },
       { path: 'posts/:id', element: <PostDetails /> },
