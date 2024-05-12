@@ -13,7 +13,7 @@ const formSchema = z.object({
   search: z.string(),
 });
 
-const ReactQueryPage = () => {
+const HomePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { data, isLoading, isError } = useGetPostsQuery();
   const { mutate: deletePost, isPending: deletePostLoading } =
@@ -58,4 +58,4 @@ const ReactQueryPage = () => {
   );
 };
 
-export default ReactQueryPage;
+export default HomePage;
