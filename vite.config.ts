@@ -6,7 +6,7 @@ import { vitePlugin as remix } from '@remix-run/dev';
 export default defineConfig({
   plugins: [
     remix({
-      ssr: false,
+      ssr: true,
     }),
     checker({ typescript: true }),
   ],
