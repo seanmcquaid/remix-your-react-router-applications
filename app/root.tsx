@@ -1,4 +1,4 @@
-import { Outlet, useNavigation } from '@remix-run/react';
+import { Outlet, Scripts, useNavigation } from '@remix-run/react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { Suspense } from 'react';
 import LoadingOverlay from './components/ui/LoadingOverlay';
@@ -26,6 +26,7 @@ const Root = () => {
             </Suspense>
           </QueryClientProvider>
         </div>
+        <Scripts />
         <noscript> You need to enable JavaScript to run this app! :( </noscript>
       </body>
     </html>
