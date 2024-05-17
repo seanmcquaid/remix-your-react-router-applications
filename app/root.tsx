@@ -1,14 +1,9 @@
-import { Outlet, Scripts, useNavigation } from '@remix-run/react';
+import { Outlet, Scripts } from '@remix-run/react';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { Suspense } from 'react';
-import LoadingOverlay from './components/ui/LoadingOverlay';
 import { Toaster } from './components/ui/Toaster';
 import queryClient from './services/queryClient';
 
 const Root = () => {
-  const navigation = useNavigation();
-  const isLoadingPage = navigation.state === 'loading';
-
   return (
     <html lang="en" className="h-screen w-full">
       <head>
@@ -19,11 +14,8 @@ const Root = () => {
       <body className="h-screen w-full">
         <div id="root">
           <QueryClientProvider client={queryClient}>
-            <LoadingOverlay isLoading={isLoadingPage} />
             <Toaster />
-            <Suspense>
-              <Outlet />
-            </Suspense>
+            <Outlet />
           </QueryClientProvider>
         </div>
         <Scripts />
