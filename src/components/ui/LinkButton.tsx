@@ -1,6 +1,6 @@
 import { Link, type LinkProps } from 'react-router-dom';
 import type { VariantProps } from 'class-variance-authority';
-import { buttonVariants } from './Button';
+import { buttonVariants } from './BButton';
 import { cn } from '@/utils/styles';
 
 type LinkButtonProps = LinkProps & VariantProps<typeof buttonVariants>;
