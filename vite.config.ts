@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react(), checker({ typescript: true })],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(__dirname, './app'),
     },
   },
   preview: {
