@@ -5,13 +5,14 @@ import LinkButton from '@/components/ui/LinkButton';
 import { useRemixForm, getValidatedFormData } from 'remix-hook-form';
 import {
   Form,
+  json,
   redirect,
   useLoaderData,
   useSearchParams,
 } from '@remix-run/react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
+import { ActionFunctionArgs } from '@remix-run/node';
 import postsService from '@/services/postsService';
 
 const formDataSchema = z.object({
@@ -22,15 +23,12 @@ type FormData = z.infer<typeof formDataSchema>;
 
 const resolver = zodResolver(formDataSchema);
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = async () => {
   const posts = await postsService.getPosts();
-  const search = new URL(request.url).searchParams.get('search') ?? '';
-  const filteredPosts = posts.filter(post =>
-    post.title.toLowerCase().includes(search.toLowerCase()),
-  );
-  return {
-    filteredPosts: filteredPosts,
-  };
+
+  return json({
+    posts,
+  });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -52,7 +50,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 const HomePage = () => {
   const [searchParams] = useSearchParams();
-  const { filteredPosts } = useLoaderData<typeof loader>();
+  const { posts } = useLoaderData<typeof loader>();
+  const filteredPosts = posts.filter(post =>
+    post.title
+      .toLowerCase()
+      .includes(searchParams.get('search')?.toLowerCase() ?? ''),
+  );
   const { register, handleSubmit } = useRemixForm<FormData>({
     resolver,
     mode: 'onSubmit',
