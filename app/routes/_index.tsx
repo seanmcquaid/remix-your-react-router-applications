@@ -2,52 +2,89 @@ import PageWrapper from '@/components/app/PageWrapper';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import LinkButton from '@/components/ui/LinkButton';
-import useDeletePostMutation from '@/services/mutations/useDeletePostMutation';
-import useGetPostsQuery from '@/services/queries/useGetPostsQuery';
-import { useForm } from 'react-hook-form';
-import { useSearchParams } from '@remix-run/react';
+import { useRemixForm, getValidatedFormData } from 'remix-hook-form';
+import {
+  Form,
+  redirect,
+  useLoaderData,
+  useSearchParams,
+} from '@remix-run/react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
+import postsService from '@/services/postsService';
 
-const formSchema = z.object({
+const formDataSchema = z.object({
   search: z.string(),
 });
 
-const HomePage = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const { data, isLoading, isError } = useGetPostsQuery();
-  const { mutate: deletePost, isPending: deletePostLoading } =
-    useDeletePostMutation();
-  const search = z.string().catch('').parse(searchParams.get('search'));
-  const { register, handleSubmit } = useForm({
-    resolver: zodResolver(formSchema),
-  });
-  const filteredPosts =
-    data?.filter(post =>
-      post.title.toLowerCase().includes(search.toLowerCase()),
-    ) ?? [];
+type FormData = z.infer<typeof formDataSchema>;
 
-  const handleOnSubmit = handleSubmit(({ search }) => {
-    setSearchParams({ search });
+const resolver = zodResolver(formDataSchema);
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const posts = await postsService.getPosts();
+  const search = new URL(request.url).searchParams.get('search') ?? '';
+  const filteredPosts = posts.filter(post =>
+    post.title.toLowerCase().includes(search.toLowerCase()),
+  );
+  return {
+    filteredPosts: filteredPosts,
+  };
+};
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const formData = await request.formData();
+  const intent = formData.get('intent');
+
+  if (intent === 'search') {
+    const { data } = await getValidatedFormData<FormData>(request, resolver);
+
+    return redirect(`?search=${encodeURIComponent(data?.search ?? '')}`);
+  }
+
+  const postId = formData.get('postId')?.toString();
+
+  await postsService.deletePost(postId ?? '');
+
+  return redirect('/');
+};
+
+const HomePage = () => {
+  const [searchParams] = useSearchParams();
+  const { filteredPosts } = useLoaderData<typeof loader>();
+  const { register, handleSubmit } = useRemixForm<FormData>({
+    resolver,
+    mode: 'onSubmit',
   });
 
   return (
-    <PageWrapper isLoading={isLoading} isError={isError}>
-      <form onSubmit={handleOnSubmit}>
-        <Input type="text" {...register('search')} />
-        <Button type="submit">Search</Button>
-      </form>
+    <PageWrapper>
+      <Form onSubmit={handleSubmit}>
+        <Input
+          type="text"
+          {...register('search')}
+          defaultValue={searchParams.get('search') ?? ''}
+        />
+        <Button type="submit" name="intent" value="search">
+          Search
+        </Button>
+      </Form>
       <ul className="grid grid-cols-2">
         {filteredPosts?.map(post => (
           <li key={post.id} className="flex mt-4 items-center">
             {post.title.substring(0, 5)}
-            <Button
-              onClick={() => deletePost(post.id.toString())}
-              disabled={deletePostLoading}
-              className="ml-4"
-            >
-              Delete
-            </Button>
+            <Form>
+              <input type="hidden" name="postId" value={post.id} />
+              <Button
+                className="ml-4"
+                type="submit"
+                name="intent"
+                value="delete"
+              >
+                Delete
+              </Button>
+            </Form>
             <LinkButton to={`posts/${post.id}`} className="ml-4">
               View
             </LinkButton>
