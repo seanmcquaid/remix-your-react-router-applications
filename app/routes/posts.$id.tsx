@@ -1,15 +1,21 @@
-import { useParams } from '@remix-run/react';
+import { json, useLoaderData } from '@remix-run/react';
 import PageWrapper from '@/components/app/PageWrapper';
-import useGetPostQuery from '@/services/queries/useGetPostQuery';
+import { LoaderFunctionArgs } from '@remix-run/node';
+import postsService from '@/services/postsService';
+
+export const loader = async ({ params }: LoaderFunctionArgs) => {
+  const post = await postsService.getPost(params?.id ?? '');
+
+  return json({ post });
+};
 
 const PostDetailsPage = () => {
-  const { id } = useParams();
-  const { data, isLoading, isError } = useGetPostQuery(id!);
+  const { post } = useLoaderData<typeof loader>();
 
   return (
-    <PageWrapper isLoading={isLoading} isError={isError}>
-      <h1>{data?.title}</h1>
-      <p>{data?.body}</p>
+    <PageWrapper>
+      <h1>{post.title}</h1>
+      <p>{post.body}</p>
     </PageWrapper>
   );
 };

@@ -34,20 +34,20 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const formData = await request.formData();
-  const intent = formData.get('intent');
+  const method = request.method;
 
-  if (intent === 'search') {
-    const { data } = await getValidatedFormData<FormData>(request, resolver);
+  if (method === 'DELETE') {
+    const formData = await request.formData();
+    const postId = formData.get('postId')?.toString();
 
-    return redirect(`?search=${encodeURIComponent(data?.search ?? '')}`);
+    await postsService.deletePost(postId ?? '');
+
+    return null;
   }
 
-  const postId = formData.get('postId')?.toString();
+  const { data } = await getValidatedFormData<FormData>(request, resolver);
 
-  await postsService.deletePost(postId ?? '');
-
-  return redirect('/');
+  return redirect(`/?search=${data?.search}`);
 };
 
 const HomePage = () => {
@@ -60,21 +60,19 @@ const HomePage = () => {
 
   return (
     <PageWrapper>
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit} method="post">
         <Input
           type="text"
           {...register('search')}
           defaultValue={searchParams.get('search') ?? ''}
         />
-        <Button type="submit" name="intent" value="search">
-          Search
-        </Button>
+        <Button type="submit">Search</Button>
       </Form>
       <ul className="grid grid-cols-2">
         {filteredPosts?.map(post => (
           <li key={post.id} className="flex mt-4 items-center">
             {post.title.substring(0, 5)}
-            <Form>
+            <Form method="delete">
               <input type="hidden" name="postId" value={post.id} />
               <Button
                 className="ml-4"
