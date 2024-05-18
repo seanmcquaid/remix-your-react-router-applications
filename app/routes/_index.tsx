@@ -4,6 +4,8 @@ import { Input } from '@/components/ui/Input';
 import LinkButton from '@/components/ui/LinkButton';
 import { useRemixForm, getValidatedFormData } from 'remix-hook-form';
 import {
+  ClientActionFunctionArgs,
+  ClientLoaderFunctionArgs,
   Form,
   json,
   redirect,
@@ -14,6 +16,9 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ActionFunctionArgs } from '@remix-run/node';
 import postsService from '@/services/postsService';
+import queryClient from '@/services/queryClient';
+import QueryKey from '@/services/queries/QueryKey';
+import Post from '@/types/Post';
 
 const formDataSchema = z.object({
   search: z.string(),
@@ -30,6 +35,32 @@ export const loader = async () => {
     posts,
   });
 };
+
+export const clientLoader = async ({
+  serverLoader,
+}: ClientLoaderFunctionArgs) => {
+  const cachedQueryData = queryClient.getQueryData<{ posts: Post[] }>([
+    QueryKey.GET_POSTS,
+  ]);
+
+  if (cachedQueryData) {
+    const cachedPosts = cachedQueryData.posts;
+    return { posts: cachedPosts };
+  }
+
+  const { posts } = await queryClient.fetchQuery({
+    queryKey: [QueryKey.GET_POSTS],
+    queryFn: () => serverLoader<{ posts: Post[] }>(),
+  });
+
+  console.log('posts', posts);
+
+  return {
+    posts,
+  };
+};
+
+clientLoader.hydrate = true;
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const method = request.method;
@@ -48,14 +79,25 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return redirect(`/?search=${data?.search}`);
 };
 
+export const clientAction = async ({
+  serverAction,
+}: ClientActionFunctionArgs) => {
+  queryClient.removeQueries({
+    queryKey: [QueryKey.GET_POSTS],
+  });
+
+  return serverAction();
+};
+
 const HomePage = () => {
   const [searchParams] = useSearchParams();
   const { posts } = useLoaderData<typeof loader>();
-  const filteredPosts = posts.filter(post =>
-    post.title
-      .toLowerCase()
-      .includes(searchParams.get('search')?.toLowerCase() ?? ''),
-  );
+  const filteredPosts =
+    posts.filter(post =>
+      post.title
+        .toLowerCase()
+        .includes(searchParams.get('search')?.toLowerCase() ?? ''),
+    ) ?? [];
   const { register, handleSubmit } = useRemixForm<FormData>({
     resolver,
     mode: 'onSubmit',

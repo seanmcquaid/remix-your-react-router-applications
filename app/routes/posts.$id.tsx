@@ -1,5 +1,6 @@
 import {
   ClientLoaderFunctionArgs,
+  Link,
   json,
   useLoaderData,
 } from '@remix-run/react';
@@ -29,9 +30,9 @@ export const clientLoader = async ({
     return json({ post: cachedPost });
   }
 
-  const post = await queryClient.fetchQuery({
+  const { post } = await queryClient.fetchQuery({
     queryKey: [QueryKey.GET_POSTS, params?.id],
-    queryFn: () => serverLoader<Post>(),
+    queryFn: () => serverLoader<{ post: Post }>(),
   });
 
   return json({
@@ -46,6 +47,7 @@ const PostDetailsPage = () => {
 
   return (
     <PageWrapper>
+      <Link to="/">Back to posts</Link>
       <h1>{post.title}</h1>
       <p>{post.body}</p>
     </PageWrapper>
