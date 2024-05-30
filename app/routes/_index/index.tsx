@@ -5,7 +5,7 @@ import LinkButton from '@/components/ui/LinkButton';
 import useDeletePostMutation from '@/services/mutations/useDeletePostMutation';
 import useGetPostsQuery from '@/services/queries/useGetPostsQuery';
 import { useForm } from 'react-hook-form';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from '@remix-run/react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
