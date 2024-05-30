@@ -9,7 +9,7 @@ installGlobals();
 export default defineConfig({
   plugins: [
     remix({
-      ssr: false,
+      ssr: true,
     }),
     checker({ typescript: true }),
     tsconfigPaths(),
