@@ -4,37 +4,34 @@ import { Input } from '@/components/ui/Input';
 import LinkButton from '@/components/ui/LinkButton';
 import useDeletePostMutation from '@/services/mutations/useDeletePostMutation';
 import useGetPostsQuery from '@/services/queries/useGetPostsQuery';
-import { useForm } from 'react-hook-form';
+import { ChangeEvent, FormEvent, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-
-const formSchema = z.object({
-  search: z.string(),
-});
 
 const HomePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState('');
   const { data, isLoading, isError } = useGetPostsQuery();
   const { mutate: deletePost, isPending: deletePostLoading } =
     useDeletePostMutation();
-  const search = z.string().catch('').parse(searchParams.get('search'));
-  const { register, handleSubmit } = useForm({
-    resolver: zodResolver(formSchema),
-  });
+  const search = searchParams.get('search') ?? '';
   const filteredPosts =
     data?.filter(post =>
       post.title.toLowerCase().includes(search.toLowerCase()),
     ) ?? [];
 
-  const handleOnSubmit = handleSubmit(({ search }) => {
-    setSearchParams({ search });
-  });
+  const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const handleOnSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSearchParams({ search: searchTerm });
+  };
 
   return (
     <PageWrapper isLoading={isLoading} isError={isError}>
       <form onSubmit={handleOnSubmit}>
-        <Input type="text" {...register('search')} />
+        <Input type="text" name="search" onChange={handleOnChange} />
         <Button type="submit">Search</Button>
       </form>
       <ul className="grid grid-cols-2">
