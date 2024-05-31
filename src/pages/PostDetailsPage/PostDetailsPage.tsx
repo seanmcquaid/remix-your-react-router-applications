@@ -9,7 +9,9 @@ const PostDetailsPage = () => {
 
   return (
     <PageWrapper isLoading={isLoading} isError={isError}>
-      <LinkButton to="/">Back to Posts</LinkButton>
+      <LinkButton to="/" className="m-4">
+        Back to Posts
+      </LinkButton>
       <h1>{data?.title}</h1>
       <p>{data?.body}</p>
     </PageWrapper>
