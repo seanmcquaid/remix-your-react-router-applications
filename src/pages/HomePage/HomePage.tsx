@@ -31,7 +31,12 @@ const HomePage = () => {
   return (
     <PageWrapper isLoading={isLoading} isError={isError}>
       <form onSubmit={handleOnSubmit}>
-        <Input type="text" name="search" onChange={handleOnChange} />
+        <Input
+          type="text"
+          name="search"
+          onChange={handleOnChange}
+          value={searchTerm}
+        />
         <Button type="submit">Search</Button>
       </form>
       <ul className="grid grid-cols-2">
