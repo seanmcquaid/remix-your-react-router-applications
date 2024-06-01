@@ -5,7 +5,7 @@ import LinkButton from '@/components/ui/LinkButton';
 import useDeletePostMutation from '@/services/mutations/useDeletePostMutation';
 import useGetPostsQuery from '@/services/queries/useGetPostsQuery';
 import { ChangeEvent, FormEvent, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from '@remix-run/react';
 
 const HomePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
