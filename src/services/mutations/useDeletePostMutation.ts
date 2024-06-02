@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import postsService from '@/services/postsService';
 import { useToast } from '@/hooks/useToast';
-import QueryKey from '../queries/QueryKey';
+import QueryKey from '../QueryKey';
 
 const useDeletePostMutation = () => {
   const queryClient = useQueryClient();
