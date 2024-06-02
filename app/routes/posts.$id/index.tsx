@@ -1,19 +1,51 @@
-import { useParams } from '@remix-run/react';
+import { ClientLoaderFunctionArgs, useLoaderData } from '@remix-run/react';
 import PageWrapper from '@/components/app/PageWrapper';
-import useGetPostQuery from '@/services/queries/useGetPostQuery';
 import LinkButton from '@/components/ui/LinkButton';
+import { LoaderFunctionArgs } from '@remix-run/node';
+import postsService from '@/services/postsService';
+import queryClient from '@/services/queryClient';
+import QueryKey from '@/services/QueryKey';
+import Post from '@/types/Post';
+
+export const loader = async ({ params }: LoaderFunctionArgs) => {
+  const post = await postsService.getPost(params.id!);
+
+  return post;
+};
+
+export const clientLoader = async ({
+  params,
+  serverLoader,
+}: ClientLoaderFunctionArgs) => {
+  const cachedPost = queryClient.getQueryData<Post>([
+    QueryKey.GET_POST,
+    params.id,
+  ]);
+
+  if (cachedPost) {
+    return cachedPost;
+  }
+
+  const post = await queryClient.fetchQuery({
+    queryKey: [QueryKey.GET_POST, params.id],
+    queryFn: () => serverLoader<Post>(),
+  });
+
+  return post;
+};
+
+clientLoader.hydrate = true;
 
 const PostDetailsPage = () => {
-  const { id } = useParams();
-  const { data, isLoading, isError } = useGetPostQuery(id!);
+  const post = useLoaderData<typeof clientLoader>();
 
   return (
-    <PageWrapper isLoading={isLoading} isError={isError}>
+    <PageWrapper>
       <LinkButton to="/" className="m-4">
         Back to Posts
       </LinkButton>
-      <h1>{data?.title}</h1>
-      <p>{data?.body}</p>
+      <h1>{post.title}</h1>
+      <p>{post.body}</p>
     </PageWrapper>
   );
 };

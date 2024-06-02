@@ -6,6 +6,8 @@ import { Toaster } from './components/ui/Toaster';
 import queryClient from './services/queryClient';
 import './styles/globals.css';
 
+export const HydrateFallback = () => <LoadingOverlay isLoading />;
+
 export const Layout = ({ children }: PropsWithChildren) => {
   const navigation = useNavigation();
   const isLoadingPage = navigation.state === 'loading';
@@ -29,7 +31,6 @@ export const Layout = ({ children }: PropsWithChildren) => {
             {children}
           </QueryClientProvider>
         </div>
-        <noscript> You need to enable JavaScript to run this app! :( </noscript>
       </body>
     </html>
   );
