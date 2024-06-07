@@ -6,6 +6,7 @@ import {
   ClientActionFunctionArgs,
   ClientLoaderFunctionArgs,
   Form,
+  useFetcher,
   useLoaderData,
   useSearchParams,
 } from '@remix-run/react';
@@ -42,8 +43,6 @@ export const clientLoader = async ({
 }: ClientLoaderFunctionArgs) => {
   const cachedPosts = queryClient.getQueryData<Post[]>([QueryKey.GET_POSTS]);
 
-  console.log('cachedPosts', cachedPosts);
-
   if (cachedPosts) {
     return cachedPosts;
   }
@@ -69,10 +68,10 @@ export const clientAction = async ({
       queryKey: [QueryKey.GET_POSTS],
     });
 
-    await serverAction();
+    const resp = await serverAction();
     toast({ title: 'I got deleted!' });
 
-    return null;
+    return resp;
   }
 
   return null;
@@ -86,6 +85,8 @@ const HomePage = () => {
     posts?.filter(post =>
       post.title.toLowerCase().includes(search.toLowerCase()),
     ) ?? [];
+  const fetcher = useFetcher();
+  const isDeleting = fetcher.state !== 'idle';
 
   return (
     <PageWrapper>
@@ -97,17 +98,18 @@ const HomePage = () => {
         {filteredPosts?.map(post => (
           <li key={post.id} className="flex mt-4 items-center">
             {post.title.substring(0, 5)}
-            <Form method="delete">
+            <fetcher.Form method="delete">
               <input type="hidden" name="postId" value={post.id} />
               <Button
                 className="ml-4"
                 type="submit"
                 name="intent"
                 value="delete"
+                disabled={isDeleting}
               >
                 Delete
               </Button>
-            </Form>
+            </fetcher.Form>
             <LinkButton to={`posts/${post.id}`} className="ml-4">
               View
             </LinkButton>
