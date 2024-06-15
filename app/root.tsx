@@ -29,7 +29,6 @@ export const Layout = ({ children }: PropsWithChildren) => {
           </QueryClientProvider>
         </div>
         <Scripts />
-        <noscript> You need to enable JavaScript to run this app! :( </noscript>
       </body>
     </html>
   );
