@@ -5,7 +5,7 @@ import {
   RouterProvider,
   createBrowserRouter,
   useNavigation,
-} from 'react-router-dom';
+} from 'react-router';
 import LoadingOverlay from './components/ui/LoadingOverlay';
 import { Toaster } from './components/ui/Toaster';
 import queryClient from './services/queryClient';
