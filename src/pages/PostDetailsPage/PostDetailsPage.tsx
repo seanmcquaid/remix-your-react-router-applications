@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import PageWrapper from '@/components/app/PageWrapper';
 import useGetPostQuery from '@/services/queries/useGetPostQuery';
 import LinkButton from '@/components/ui/LinkButton';
