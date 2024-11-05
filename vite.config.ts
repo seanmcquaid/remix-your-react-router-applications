@@ -6,7 +6,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 export default defineConfig({
   plugins: [
     reactRouter({
-      ssr: false,
+      ssr: true,
     }),
     checker({ typescript: true }),
     tsconfigPaths(),
