@@ -24,8 +24,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./app/*"]
-    }
+    },
+    "rootDirs": [".", "./.react-router/types"]
   },
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["**/*.ts", "**/*.tsx", ".react-router/types/**/*"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
