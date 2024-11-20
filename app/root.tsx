@@ -35,7 +35,6 @@ export const Layout = ({ children }: PropsWithChildren) => {
         </QueryClientProvider>
         <Scripts />
         <ScrollRestoration />
-        <noscript> You need to enable JavaScript to run this app! :( </noscript>
       </body>
     </html>
   );

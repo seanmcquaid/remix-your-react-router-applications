@@ -1,19 +1,39 @@
-import { useParams } from 'react-router';
 import PageWrapper from '@/components/app/PageWrapper';
-import useGetPostQuery from '@/services/queries/useGetPostQuery';
 import LinkButton from '@/components/ui/LinkButton';
+import { Route } from './+types/posts.$id';
+import postsService from '@/services/postsService';
+import queryClient from '@/services/queryClient';
+import QueryKey from '@/services/QueryKey';
 
-const PostDetailsPage = () => {
-  const { id } = useParams();
-  const { data, isLoading, isError } = useGetPostQuery(id!);
+export const loader = async ({ params }: Route.LoaderArgs) => {
+  const id = params.id;
+  const post = await postsService.getPost(id);
 
+  return { post };
+};
+
+export const clientLoader = async ({
+  serverLoader,
+  params,
+}: Route.ClientLoaderArgs) => {
+  const { post } = await queryClient.ensureQueryData({
+    queryKey: [QueryKey.GET_POST, params.id],
+    queryFn: serverLoader,
+  });
+
+  return { post };
+};
+
+clientLoader.hydrate = true;
+
+const PostDetailsPage = ({ loaderData }: Route.ComponentProps) => {
   return (
-    <PageWrapper isLoading={isLoading} isError={isError}>
+    <PageWrapper>
       <LinkButton to="/" className="m-4">
         Back to Posts
       </LinkButton>
-      <h1>{data?.title}</h1>
-      <p>{data?.body}</p>
+      <h1>{loaderData.post.title}</h1>
+      <p>{loaderData.post.body}</p>
     </PageWrapper>
   );
 };
